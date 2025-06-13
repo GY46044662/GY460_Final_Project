@@ -1331,7 +1331,7 @@ legend_tile <- ggplot(legend_data, aes(x = x, y = y)) +
   ) +
   coord_fixed(ratio = 1.5) +
   labs(
-    x = "Greenspace Change",
+    x = "Green Space Change",
     y = "Crime Rate Change"
   ) +
   theme_minimal(base_size = 8) +
