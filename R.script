@@ -21,7 +21,7 @@ library(readr)
 setwd("~/Desktop/Data")
 
 ## Loading and combining shapefiles
-lsoa_dir <- "~/Desktop/Data/LB_shp/"
+lsoa_dir <- "LB_shp/"
 lsoa_shps <- dir_ls(lsoa_dir, regexp = "\\.shp$")
 
 lsoa_sf <- map_dfr(lsoa_shps, ~ {
@@ -30,13 +30,12 @@ lsoa_sf <- map_dfr(lsoa_shps, ~ {
 })
 
 ## Loading green space comparison
-greenspace_comparison <- read_csv("~/Desktop/Data/Greenspace_Comparison_2017_2024.csv") %>%
+greenspace_comparison <- read_csv("Greenspace_Comparison_2017_2024.csv") %>%
   mutate(lsoa21cd = as.character(lsoa21cd),
          area_km2 = total_area_sqm_2017 / 1e6)
 
 ## Loading crime data and join LSOA lookup
-data_dir <- "~/Desktop/Data/Crimes"
-file_list <- list.files(path = data_dir, 
+file_list <- list.files(path = "Crimes", 
                         pattern = "-(metropolitan|city-of-london)-street\\.csv$", 
                         full.names = TRUE)
 
@@ -44,7 +43,7 @@ all_crime_data <- file_list %>%
   lapply(read.csv, stringsAsFactors = FALSE) %>%
   bind_rows()
 
-lsoa_lookup <- read_csv("~/Desktop/Data/LSOA_(2011)_to_LSOA_(2021)_to_Local_Authority_District_(2022)_Exact_Fit_Lookup_for_EW_(V3).csv") %>%
+lsoa_lookup <- read_csv("LSOA_(2011)_to_LSOA_(2021)_to_Local_Authority_District_(2022)_Exact_Fit_Lookup_for_EW_(V3).csv") %>%
   select(LSOA11CD, LSOA21CD)
 
 all_crime_data <- all_crime_data %>%
@@ -54,7 +53,7 @@ all_crime_data <- all_crime_data %>%
   rename(LSOA.code = LSOA21CD)
 
 ## Load Borough Geometry
-boroughs <- st_read("~/Desktop/Data/districts.shp") %>%
+boroughs <- st_read("districts.shp") %>%
   st_transform(crs = 27700)
 
 ## Loading and processing population data (2011–2024)
@@ -62,7 +61,7 @@ sheets <- 11:16
 years <- 2017:2022
 
 load_population <- function(sheet, year) {
-  read_excel("~/Desktop/Data/sapelsoabroadage20112022.xlsx", sheet = sheet, skip = 3) %>%
+  read_excel("sapelsoabroadage20112022.xlsx", sheet = sheet, skip = 3) %>%
     select(
       lsoa_code = `LSOA 2021 Code`,
       Total,
@@ -126,7 +125,7 @@ pop_total_2017 <- population_full %>%
   select(lsoa_code, Total)
 
 # Loading IMD and ethnicity datasets
-imd_2019 <- read_excel("~/Desktop/Data/ID 2019 for London.xlsx", sheet = 2) %>%
+imd_2019 <- read_excel("ID 2019 for London.xlsx", sheet = 2) %>%
   select(
     LSOA_code = `LSOA code (2011)`,
     imd_score = `Index of Multiple Deprivation (IMD) Score`,
@@ -135,7 +134,7 @@ imd_2019 <- read_excel("~/Desktop/Data/ID 2019 for London.xlsx", sheet = 2) %>%
     env_score = `Living Environment Score`
   )
 
-ethnicity_data <- read_excel("~/Desktop/Data/Ethnic group.xlsx", sheet = 4) %>%
+ethnicity_data <- read_excel("Ethnic group.xlsx", sheet = 4) %>%
   rename(
     LSOA_code = `LSOA code`,
     white_british = `White British`,
@@ -162,9 +161,9 @@ greenspace_comparison <- greenspace_comparison %>%
   left_join(percent_nonwhite, by = c("lsoa21cd" = "LSOA_code"))
 
 # Loading tree canopy and ward shapes
-canopy_data <- read_excel("~/Desktop/Data/London Canopy Cover Mapping - Ward Prioritisation Tool.xlsx", sheet = 2)
+canopy_data <- read_excel("London Canopy Cover Mapping - Ward Prioritisation Tool.xlsx", sheet = 2)
 
-wards <- st_read("~/Desktop/Data/London-wards-2018/London-wards-2018_ESRI/London_Ward.shp") %>%
+wards <- st_read("London-wards-2018/London-wards-2018_ESRI/London_Ward.shp") %>%
   st_transform(27700)
 
 # ====================================
